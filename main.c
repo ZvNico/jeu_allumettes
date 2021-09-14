@@ -76,6 +76,8 @@ int main()
 
                     case 2 :
 
+                        printf("Attention, il existe 3 niveaux de difficulte en version humain et ordi. Le 1er est plutot simple a battre, donc pour les debutants. Mais le dernier...Contactez-moi si vous avez reussi, mon email est dans les credits");
+
                         do
                         {
                             printf("\n\n Voulez-vous retourner au menu \n\n\t 1. Oui \t\t 2. Non\n\n\n");
@@ -136,6 +138,7 @@ int main()
             printf("\n\n\t\t Thanks for spending time on our project!!\n");
             printf("\n\t\t\t See you soon !!:)\n");
             printf("\n\t - Nico et Rania ❤ \n\n");
+            break;
 
         }
         else
