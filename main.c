@@ -1,154 +1,161 @@
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
 
-int menu() {
+typedef enum {
+    false,
+    true
+} Bool;
 
-    printf("\n=============================================================\n");
-    printf("\n\t\t\t\t C LANGUAGE 2021-2022\n\n");
-    printf("\n\t\t\tProjet  : Jeux des allumettes \n\n");
-    printf("\n\t Project by Nicolas Baconnier and Rania Dahane \n\n");
+typedef enum {
+    expert,
+    naive
+} Mode;
 
-    printf("Vous allez avoir trois menus. \n");
-    printf("Vous choisirez d'abord si vous voulez voir les regles du jeu ou non,\n");
-    printf("puis le nombre d'allumettes a utiliser et enfin le nombre de joueurs\n");
+typedef struct Joueur {
+    char name[31];
+    Bool is_computer;
+    Mode mode;
+    unsigned int score;
+} Joueur;
 
+
+unsigned int play_human(int n_matches, Joueur *joueur) {
+    int n;
+    do {
+        printf("%s - Nombre d'allumettes a enlever: ", joueur->name);
+        scanf("%u", &n);
+        fflush(stdin);
+    } while ((n_matches - n < 0) || n < 1 || n > 3);
+    return n;
+}
+
+unsigned int play_computer(int n_matches, Joueur *joueur) {
+    int i;
+    if (joueur->mode == expert) {
+        for (i = 1; i < 4; ++i) {
+            if ((n_matches - i - 1) % 4 == 0) {
+                return i;
+            }
+        }
+        return 1;
+    } else if (joueur->mode == naive) {
+        return 1 + rand() % 2;
+    }
+};
+
+unsigned int menu() {
     int choix;
-    printf("\n\t ======= Menu =======\n\n");
-    printf("\t1.Jouer\n");
-    printf("\t2.Voir les regles du jeu\n");
-    printf("\t3.Voir les credits\n");
-    printf("\t4.Quitter\n");
-    printf("\n     Que faire ? ");
-    scanf("%d", &choix);
-    printf("\n");
+    do {
+        printf("\n\t ======= Menu =======\n\n"
+               "\t1.Jouer\n"
+               "\t2.Voir les regles du jeu\n"
+               "\t3.Voir les credits\n"
+               "\t4.Quitter\n"
+               "\tQue faire ?\n\t-> ");
+        scanf("%d", &choix);
+        fflush(stdin);
+    } while (choix != 1 && choix != 2 && choix != 3 && choix != 4);
     return choix;
 }
-//initialisation du menu1
-int menu_access_service(){
-    int choix2;
-    printf("\n\t ======= Choix des joueurs  =======\n\n");
-    printf("\t1 Joueur\n");
-    printf("\t2 Joueurs\n");
-    printf("\t3. Quitter\n");
-    printf("\n     Que faire? ");
-    scanf("%d", &choix2);
-    printf("\n");
-    return choix2;
-}
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-int main()
-{
-    // Menu
-    int mainmenu = menu();
-
-    do
-    {
-        if (mainmenu==1)
-        {
-            int case1 = menu_access_service();
-            int answer;
-            do
-            {
-                switch(case1)
-                {
-                    case 1 :
-
-                        do
-                        {
-                            printf("\n\n Voulez-vous retourner au menu \n\n\t 1. Oui \t\t 2. Non\n\n\n");
-                            printf("Que faire?  ");
-                            scanf("%d", &answer);
-                            if (answer == 1 )
-                            {
-                                mainmenu = menu();
-                            } else if (answer == 2)
-                            {
-                                case1 = menu_access_service();
-                            }
-                        } while ((answer != 1) && (answer != 2));
-
-                        break;
-
-                    case 2 :
-
-                        printf("Attention, il existe 3 niveaux de difficulte en version humain et ordi. Le 1er est plutot simple a battre, donc pour les debutants. Mais le dernier...Contactez-moi si vous avez reussi, mon email est dans les credits");
-
-                        do
-                        {
-                            printf("\n\n Voulez-vous retourner au menu \n\n\t 1. Oui \t\t 2. Non\n\n\n");
-                            printf("Que faire ?  ");
-                            scanf("%d", &answer);
-                            if (answer == 1 )
-                            {
-                                mainmenu = menu();
-                            } else if (answer == 2)
-                            {
-                                case1 = menu_access_service();
-                            }
-                        } while ((answer != 1) && (answer != 2));
-                        break;
-
-                    case 3 :
-
-
-                        do
-                        {
-                            printf("\n\n Voulez-vous retourner au menu \n\n\t 1. Oui \t\t 2. Non\n\n\n");
-                            printf("Que faire ?  ");
-                            scanf("%d", &answer);
-                            if (answer == 1 )
-                            {
-                                mainmenu = menu();
-                            } else if (answer == 2)
-                            {
-                                case1 = menu_access_service();
-                            }
-                        } while ((answer != 1) && (answer != 2));
-
-                        break;
-
-                    case 4 :
-                        printf("\n\n\t\t Thanks for spending time on our project!!\n");
-                        printf("\n\t\t\t See you soon !!:)\n");
-                        printf("\n\t - Nicolas et Rania ❤ \n\n");
-
-                        break;
-
-                    default :
-                        printf("\n\t\t\t\t ERROR \n\n");
-                        printf("\n\t REDIRECTION TO THE MAIN MENU  \n\n");
-                        break;
+int main() {
+    srand(time(NULL)); // init limited randomness
+    fflush(stdin);
+    unsigned n_matches, i, menu_input, play;
+    Bool quitter = false;
+    Joueur *J1, *J2;
+    int turn;
+    J1 = malloc(sizeof(Joueur));
+    J2 = malloc(sizeof(Joueur));
+    Joueur *joueurs[2] = {J1, J2};
+    printf("\n\t\t C LANGUAGE 2021-20202\n\n"
+           "Projet: Jeux des allumettes\n"
+           "\tpar Nicolas Baconnier et Rania Dahane\n\n"
+           "Vous allez avoir trois menus. \n"
+           "Vous choisirez d'abord si vous voulez voir les regles du jeu ou non,\n"
+           "puis le nombre d'allumettes a utiliser et enfin le nombre de joueurs\n");
+    Mode mode;
+    while (quitter == false) {
+        menu_input = menu();
+        switch (menu_input) {
+            case 1:
+                turn = 0;
+                for (i = 0; i < 2; ++i) {
+                    joueurs[i]->score = 0;
+                    do {
+                        printf("J%d:\n\t1.Human\n\t2.Computer\n\t-> ", i + 1);
+                        scanf("%u", &joueurs[i]->is_computer);
+                        fflush(stdin);
+                        joueurs[i]->is_computer--;
+                    } while (joueurs[i]->is_computer != true && joueurs[i]->is_computer != false);
+                    if (joueurs[i]->is_computer == true) {
+                        sprintf(joueurs[i]->name, "Ordi %d", i + 1);
+                        do {
+                            printf("Mode:\n\t1.expert\n\t2.naive\n\t-> ");
+                            scanf("%u", &joueurs[i]->mode);
+                            fflush(stdin);
+                        } while (joueurs[i]->mode != expert && joueurs[i]->mode != naive);
+                        joueurs[i]->mode--;
+                    } else {
+                        printf("J%d Pseudo: \n\t-> ", i + 1);
+                        scanf("%s", joueurs[i]->name);
+                    }
                 }
-            }while ((case1 != 1) && (case1 != 2) && (case1 != 3) && (case1 != 4));
+                do {
+                    printf("Nombre d'allumettes: ");
+                    scanf("%u", &n_matches);
+                    fflush(stdin);
+                } while (n_matches < 0);
+                for (i = 0; i < 2; ++i) {
+                    if (joueurs[i]->is_computer) {
+                        printf("%s - ", joueurs[i]->name);
+                    } else {
+                        printf("J%d - ", i + 1);
+                        printf("%s", joueurs[i]->name);
+                    }
+                    if (joueurs[i]->is_computer) {
+                        printf("niveau %u", joueurs[i]->mode + 1);
+                    }
+                    if (i == 0) {
+                        printf(" vs ");
+                    } else {
+                        printf(", avec %d allumettes au depart.\n", n_matches);
+                    }
+                }
+                while (n_matches > 0) {
+                    for (i = 0; i < n_matches; ++i) {
+                        printf("| ");
+                    };
+                    printf("\tIl reste %d allumettes\n", n_matches);
+                    if (joueurs[turn % 2]->is_computer) {
+                        play = play_computer((int) n_matches, joueurs[turn % 2]);
+                        printf("%s - Nombre d'allumettes a enlever : %d\n", joueurs[turn % 2]->name, play);
+                    } else {
+                        play = play_human((int) n_matches, joueurs[turn % 2]);
+                    }
+                    n_matches -= play;
+                    turn++;
+                }
+                joueurs[turn % 2]->score++;
+                printf("%s %d - %d %s\n", joueurs[0]->name, joueurs[0]->score, joueurs[1]->score, joueurs[1]->name);
+                break;
+            case 2:
+                printf("Le but du jeu est simple\n\n"
+                       "Ce jeu se joue a deux. Vous avez un nombre n d'allumettes.\n"
+                       "A tour de role, chacun des deux joueurs enleve entre 1 et 3 allumettes selon ce qu'il souhaite. Le perdant est celui qui doit enlever la derniere allumette\n\n"
+                       "");
+                break;
+            case 3:
+                printf("Pas encore implémenté ! ");
+                break;
+            case 4:
+                quitter = true;
         }
-
-        else if (mainmenu==3)
-        {
-            printf("\n\t ======= Credit  =======\n\n");
-
-            mainmenu=menu();
-        }
-        else if (mainmenu==4)
-        {
-            printf("\n\n\t\t Thanks for spending time on our project!!\n");
-            printf("\n\t\t\t See you soon !!:)\n");
-            printf("\n\t - Nico et Rania ❤ \n\n");
-            break;
-
-        }
-        else
-        {
-            printf("\n\t\t\t\t ERROR \n\n");
-            printf("\n\t REDIRECTION TO THE MAIN MENU  \n\n");
-            mainmenu=menu();
-            break;
-        }
-
-    }while ((mainmenu != 1) || (mainmenu != 2) ||(mainmenu != 3) ||(mainmenu != 4));
+    }
+    free(J1);
+    free(J2);
     return 0;
 }
